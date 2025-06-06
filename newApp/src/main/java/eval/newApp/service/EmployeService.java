@@ -110,4 +110,47 @@ public class EmployeService
         }
     }
 
+
+
+    public List<EmployeeDTO> getEmployees(String sid) throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cookie", "sid=" + sid);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+
+        // Construction de l'URL avec les champs souhaités et les filtres
+        String url = UriComponentsBuilder
+                .fromHttpUrl(baseUrl + "/api/resource/Employee")
+                .queryParam("fields", "[\"name\",\"employee_name\",\"first_name\",\"gender\",\"date_of_joining\",\"date_of_birth\"]")
+                .build(false)
+                .toUriString();
+
+        System.out.println("URL: " + url);
+
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            JsonNode root = objectMapper.readTree(response.getBody());
+            JsonNode data = root.get("data");
+
+            List<EmployeeDTO> employees = new ArrayList<>();
+            for (JsonNode employeeNode : data) {
+                EmployeeDTO employee = new EmployeeDTO();
+                employee.setEmployeeNumber(employeeNode.path("name").asText(null));
+                employee.setEmployeeName(employeeNode.path("employee_name").asText(null));
+                employee.setFirstName(employeeNode.path("first_name").asText(null));
+                employee.setGender(employeeNode.path("gender").asText(null));
+                employee.setDateOfJoining(objectMapper.treeToValue(employeeNode.path("date_of_joining"), Date.class));
+                employee.setDateOfBirth(objectMapper.treeToValue(employeeNode.path("date_of_birth"), Date.class));
+
+                employees.add(employee);
+            }
+
+            return employees;
+        } else {
+            throw new Exception("Échec de la récupération des employés : " + response.getStatusCode());
+        }
+    }
+
 }

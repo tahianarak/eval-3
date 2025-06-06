@@ -40,6 +40,9 @@ public class loginController
             LoginResponseHeaders loginResponseHeaders=erpLoginService.loginToErp(loginRequest);
             session.setAttribute("headers",loginResponseHeaders);
             session.setAttribute("token",loginResponseHeaders.getSid());
+
+            System.out.println("sid:"+loginResponseHeaders.getSid());
+
             return mv;
         }
         catch (Exception e)

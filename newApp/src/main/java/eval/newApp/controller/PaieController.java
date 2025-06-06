@@ -10,6 +10,7 @@ import eval.newApp.service.SalarySlipService;
 import jakarta.jws.WebParam;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -89,7 +91,7 @@ public class PaieController {
     }
 
     @GetMapping("/paies-pdf")
-    public ModelAndView genererPdf(@RequestParam("fiche") String fiche,HttpSession session)
+    public ResponseEntity<byte[]> genererPdf(@RequestParam("fiche") String fiche, HttpSession session)
     {
         try {
             String sid=null;
@@ -103,21 +105,38 @@ public class PaieController {
 
 
             // Crée le nom du fichier
-            String fileName = "fiche_" + fiche.replace("\\","-").replace(" ","-") + ".pdf";
-            Path outputPath = Paths.get("D:\\tahiana\\s6\\evaluation n3\\pdf", "fichier.pdf");
+            String fileName = "fiche_" + fiche.replace('/','-') + ".pdf";
+
+
+            // Création des en-têtes HTTP pour le téléchargement
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition
+                    .builder("attachment")
+                    .filename(fileName)
+                    .build());
+            headers.setContentLength(pdf.length);
+
+
+
+
+            System.out.println(fileName);
+            Path outputPath = Paths.get("D:\\tahiana\\s6\\evaluation n3\\pdf", fileName);
 
             // Écrit le fichier dans le système de fichiers
             try (FileOutputStream fos = new FileOutputStream(outputPath.toFile())) {
                 fos.write(pdf);
             }
-            return new ModelAndView("acceuil");
+            return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
         }
         catch (Exception e)
         {
             e.printStackTrace();
             ModelAndView mvi=new ModelAndView("error");
             mvi.addObject("error",e.getMessage());
-            return mvi;
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(("Erreur : " + e.getMessage()).getBytes(StandardCharsets.UTF_8));
         }
     }
     @GetMapping("/paies-all")

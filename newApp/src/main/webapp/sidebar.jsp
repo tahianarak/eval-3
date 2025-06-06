@@ -6,8 +6,11 @@
   <ul class="sidebar-menu">
 
     <li><a href="<%= request.getContextPath() %>/getFiltreEmploye">liste des employes</a></li>
-    <li><a href="<%= request.getContextPath() %>/paies-all">fiches de paies </a></li>
     <li><a href="<%= request.getContextPath() %>/salaire-details-filtre">salaire details </a></li>
+    <li><a href="<%= request.getContextPath() %>/import">importer les donnees </a></li>
+    <li><a href="<%= request.getContextPath() %>/statistique">statistique</a></li>
+    <li><a href="<%= request.getContextPath() %>/get-graph">graphique</a></li>
+
 
     <li><a href="/logout"> Déconnexion</a></li>
   </ul>

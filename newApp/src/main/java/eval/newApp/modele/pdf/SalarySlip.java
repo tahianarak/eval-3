@@ -2,10 +2,14 @@ package eval.newApp.modele.pdf;
 
 
 
+import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class SalarySlip {
     String id;
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
     public String getId() {
         return id;
@@ -18,6 +22,9 @@ public class SalarySlip {
     private String employeeName;
     private String employeeId;
     private String payPeriod;
+
+    Date startDate;
+    Date endDate;
     private String department;
 
     private List<Earning> earnings;
@@ -27,7 +34,30 @@ public class SalarySlip {
     private double totalDeductions;
     private double netPay;
 
-    // Getters & Setters
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        try {
+            this.startDate = formatter.parse(startDate);
+        } catch (ParseException e) {
+            throw new RuntimeException("Format de date invalide pour startDate : " + startDate, e);
+        }
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        try {
+            this.endDate = formatter.parse(endDate);
+        } catch (ParseException e) {
+            throw new RuntimeException("Format de date invalide pour endDate : " + endDate, e);
+        }
+    }
+// Getters & Setters
 
     public String getEmployeeName() {
         return employeeName;

@@ -13,7 +13,12 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -31,11 +36,21 @@ public class SalarySlipService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         String url = baseUrl + "/api/resource/Salary Slip?fields=[\"name\",\"employee\",\"employee_name\",\"start_date\",\"end_date\",\"department\",\"gross_pay\",\"net_pay\"]";
 
+
+
         if (monthYear != null) {
-            String filter = String.format("[[\"Salary Slip\",\"start_date\",\"like\",\"%s\"]]", monthYear);
-            url += "&filters=" + filter;
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+            YearMonth yearMonth = YearMonth.parse(monthYear, formatter);
+
+            // Définir les dates de début et de fin du mois
+            String startDate = yearMonth.atDay(1).toString(); // Premier jour du mois
+            String endDate = yearMonth.atEndOfMonth().toString();
+            String filters = String.format("[[\"Salary Slip\", \"start_date\", \">=\", \"%s\"], [\"Salary Slip\", \"end_date\", \"<=\", \"%s\"]]",
+                    startDate, endDate);
+            url += "&filters=" + filters;
         }
 
+        System.out.println("url:"+url);
 
         HttpEntity<String> request = new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
@@ -53,9 +68,12 @@ public class SalarySlipService {
                     partialSlip.setEmployeeName(data.path("employee_name").asText(null));
                     partialSlip.setEmployeeId(data.path("employee").asText(null));
                     partialSlip.setPayPeriod(data.path("start_date").asText(null) + " - " + data.path("end_date").asText(null));
+                    partialSlip.setStartDate(data.path("start_date").asText(null));
+                    partialSlip.setEndDate(data.path("end_date").asText(null));
                     partialSlip.setDepartment(data.path("department").asText(null));
                     partialSlip.setGrossPay(data.path("gross_pay").asDouble(0.0));
                     partialSlip.setNetPay(data.path("net_pay").asDouble(0.0));
+
 
                     salarySlips.add(partialSlip);
                 }
@@ -67,6 +85,9 @@ public class SalarySlipService {
                 SalarySlip fullSlip = getSalarySlipById(sid, slip.getId());
                 fullSalarySlips.add(fullSlip);
             }
+
+
+            fullSalarySlips.sort(Comparator.comparing(SalarySlip::getStartDate));
 
             return fullSalarySlips;
         } else {
@@ -95,6 +116,8 @@ public class SalarySlipService {
             salarySlip.setEmployeeId(data.path("employee").asText(null));
             salarySlip.setPayPeriod(data.path("start_date").asText(null) + " - " + data.path("end_date").asText(null));
             salarySlip.setDepartment(data.path("department").asText(null));
+            salarySlip.setStartDate(data.path("start_date").asText(null));
+            salarySlip.setEndDate(data.path("end_date").asText(null));
 
             salarySlip.setGrossPay(data.path("gross_pay").asDouble(0.0));
             salarySlip.setTotalDeductions(data.path("total_deductions").asDouble(0.0));

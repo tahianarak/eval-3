@@ -2,6 +2,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="eval.newApp.modele.employe.EmployeeDTO" %>
 <%@ page import="eval.newApp.modele.login.LoginResponseHeaders" %>
+<%@ page import="java.text.SimpleDateFormat" %>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -13,6 +14,7 @@
 <jsp:include page="sidebar.jsp" />
 
 <%
+    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
     LoginResponseHeaders headers = (LoginResponseHeaders) session.getAttribute("headers");
     String nomUtilisateur = headers != null ? headers.getFullName() : "Utilisateur";
     List<EmployeeDTO> employes = (List<EmployeeDTO>) request.getAttribute("employes");
@@ -35,7 +37,6 @@
 
         <label for="genre">Genre:</label>
         <select id="genre" name="genre" required>
-            <option value="">-- Choisir --</option>
             <option value="Male">Homme</option>
             <option value="Female">Femme</option>
             <option value="Other">Autre</option>
@@ -65,8 +66,8 @@
                     <td><%= emp.getEmployeeName() %></td>
                     <td><%= emp.getFirstName() %></td>
                     <td><%= emp.getGender() %></td>
-                    <td><%= emp.getDateOfJoining() %></td>
-                    <td><%= emp.getDateOfBirth() %></td>
+                    <td><%= sdf.format(emp.getDateOfJoining()) %></td>
+                    <td><%= sdf.format(emp.getDateOfBirth()) %></td>
                     <td><button><a href="<%= request.getContextPath() %>/paies-all?emp=<%=emp.getEmployeeNumber()%>">voir fiche</a></button></td>
                 </tr>
         <%  }

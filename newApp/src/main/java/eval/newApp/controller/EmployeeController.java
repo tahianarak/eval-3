@@ -29,8 +29,9 @@ public class EmployeeController
                 throw new Exception("pas de session valide");
             }
             sid=session.getAttribute("token").toString();
+            List<EmployeeDTO> employeeDTO=employeService.getEmployees(sid);
             ModelAndView mv=new ModelAndView("liste-employes");
-
+            mv.addObject("employes",employeeDTO);
             return mv;
 
         }
