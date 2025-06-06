@@ -34,7 +34,7 @@ public class SalarySlipService {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cookie", "sid=" + sid);
         headers.setContentType(MediaType.APPLICATION_JSON);
-        String url = baseUrl + "/api/resource/Salary Slip?fields=[\"name\",\"employee\",\"employee_name\",\"start_date\",\"end_date\",\"department\",\"gross_pay\",\"net_pay\"]";
+        String url = baseUrl + "/api/resource/Salary Slip?fields=[\"name\",\"employee\",\"employee_name\",\"start_date\",\"end_date\",\"department\",\"gross_pay\",\"net_pay\"]"+"&limit_page_length=2500";
 
 
 
@@ -58,6 +58,7 @@ public class SalarySlipService {
         if (response.getStatusCode() == HttpStatus.OK) {
             JsonNode root = objectMapper.readTree(response.getBody());
             JsonNode dataArray = root.get("data");
+            System.out.println(dataArray);
             List<SalarySlip> salarySlips = new ArrayList<>();
 
             if (dataArray.isArray()) {

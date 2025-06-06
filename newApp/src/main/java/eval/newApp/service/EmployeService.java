@@ -79,6 +79,7 @@ public class EmployeService
                 .fromHttpUrl(baseUrl + "/api/resource/Employee")
                 .queryParam("fields", "[\"name\",\"employee_name\",\"first_name\",\"gender\",\"date_of_joining\",\"date_of_birth\"]")
                 .queryParam("filters", filtersJson)
+                .queryParam("limit_page_length","2500")
                 .build(false)
                 .toUriString();
 
@@ -122,6 +123,7 @@ public class EmployeService
         String url = UriComponentsBuilder
                 .fromHttpUrl(baseUrl + "/api/resource/Employee")
                 .queryParam("fields", "[\"name\",\"employee_name\",\"first_name\",\"gender\",\"date_of_joining\",\"date_of_birth\"]")
+                .queryParam("limit_page_length","2500")
                 .build(false)
                 .toUriString();
 

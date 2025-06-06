@@ -35,6 +35,7 @@ public class PaieService {
                 .fromHttpUrl(baseUrl + "/api/resource/Salary Slip")
                 .queryParam("fields", "[\"name\",\"employee\",\"employee_name\",\"start_date\",\"gross_pay\",\"net_pay\"]")
                 .queryParam("filters", filtersJson)
+                .queryParam("limit_page_length","2500")
                 .build(false)
                 .toUriString();
 

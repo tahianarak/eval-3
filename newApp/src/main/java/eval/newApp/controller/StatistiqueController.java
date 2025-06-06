@@ -52,6 +52,7 @@ public class StatistiqueController
             sid=session.getAttribute("token").toString();
             List<StatSalarySlip> statSalarySlips=salarySlipStatisticsService.getStaticsDataFiltre(sid,annee);
             ModelAndView mv=new ModelAndView("statistique");
+            mv.addObject("statdata",salarySlipStatisticsService.buildStatData(statSalarySlips));
             mv.addObject("statistiques",statSalarySlips);
             return mv;
         } catch (Exception e) {
@@ -76,6 +77,7 @@ public class StatistiqueController
             List<StatSalarySlip> statSalarySlips=salarySlipStatisticsService.getStaticsData(sid);
             ModelAndView mv=new ModelAndView("statistique");
             mv.addObject("statistiques",statSalarySlips);
+            mv.addObject("statdata",salarySlipStatisticsService.buildStatData(statSalarySlips));
             return mv;
         } catch (Exception e) {
             e.printStackTrace();
