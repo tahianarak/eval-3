@@ -68,7 +68,7 @@
                     <td><%= emp.getGender() %></td>
                     <td><%= sdf.format(emp.getDateOfJoining()) %></td>
                     <td><%= sdf.format(emp.getDateOfBirth()) %></td>
-                    <td><button><a href="<%= request.getContextPath() %>/paies-all?emp=<%=emp.getEmployeeNumber()%>">voir fiche</a></button></td>
+                    <td><a href="<%= request.getContextPath() %>/paies-all?emp=<%=emp.getEmployeeNumber()%>"><button class="button-liste">voir fiche</button></a></td>
                 </tr>
         <%  }
         } else { %>
@@ -140,6 +140,17 @@
         border: 1px solid #ccc;
         border-radius: 4px;
     }
+
+
+    .button-liste {
+            padding: 8px 16px;
+            background-color:#4a9079;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+    }
+
 
     .filter-form button {
         padding: 8px 16px;

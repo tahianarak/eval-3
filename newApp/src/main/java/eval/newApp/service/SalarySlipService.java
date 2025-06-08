@@ -113,6 +113,7 @@ public class SalarySlipService {
             JsonNode data = root.get("data");
 
             SalarySlip salarySlip = new SalarySlip();
+            salarySlip.setId(salarySlipId);
             salarySlip.setEmployeeName(data.path("employee_name").asText(null));
             salarySlip.setEmployeeId(data.path("employee").asText(null));
             salarySlip.setPayPeriod(data.path("start_date").asText(null) + " - " + data.path("end_date").asText(null));

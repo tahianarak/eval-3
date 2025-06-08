@@ -1,8 +1,9 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="eval.newApp.modele.pdf.SalarySlip" %>
 <%@ page import="eval.newApp.modele.pdf.Earning" %>
 <%@ page import="eval.newApp.modele.pdf.Deduction" %>
+<%@ page import="eval.newApp.modele.utils.NumberFormatterUtil" %>
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -51,7 +52,7 @@
                     <%
                         for (Earning e : slip.getEarnings()) {
                     %>
-                    <li><%= e.getDescription() %> : <%= String.format("%.2f Ar", e.getAmount()) %></li>
+                    <li><p class="p-info"><%= e.getDescription() %> :</p> <%= NumberFormatterUtil.formatAmount( e.getAmount()) %></li>
                     <%
                         }
                     %>
@@ -62,15 +63,15 @@
                     <%
                         for (Deduction d : slip.getDeductions()) {
                     %>
-                    <li><%= d.getDescription() %> : <%= String.format("%.2f Ar", d.getAmount()) %></li>
+                    <li><p class="p-success"><%= d.getDescription() %> :</p> <%= NumberFormatterUtil.formatAmount( d.getAmount()) %></li>
                     <%
                         }
                     %>
                 </ul>
             </td>
-            <td><%= String.format("%.2f Ar", slip.getGrossPay()) %></td>
-            <td><%= String.format("%.2f Ar", slip.getTotalDeductions()) %></td>
-            <td><%= String.format("%.2f Ar", slip.getNetPay()) %></td>
+            <td><%=NumberFormatterUtil.formatAmount( slip.getGrossPay()) %></td>
+            <td><%= NumberFormatterUtil.formatAmount( slip.getTotalDeductions()) %></td>
+            <td><%= NumberFormatterUtil.formatAmount( slip.getNetPay()) %></td>
         </tr>
         <%
                 }
@@ -158,6 +159,21 @@
     .text-center {
         text-align: center;
     }
+
+
+    .p-info {
+        color: #4b6cb7;        /* Bleu ERPStyle */
+        font-weight: bold;
+        margin: 10px 0;
+    }
+
+
+    .p-success {
+        color: #4a9079;        /* Vert foncé élégant */
+        font-weight: bold;
+        margin: 10px 0;
+    }
+
 </style>
 
 </body>

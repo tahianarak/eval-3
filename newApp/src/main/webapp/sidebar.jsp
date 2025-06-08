@@ -12,7 +12,7 @@
     <li><a href="<%= request.getContextPath() %>/get-graph">graphique</a></li>
 
 
-    <li><a href="/logout"> Déconnexion</a></li>
+    <li><a href="/logout"> Deconnexion</a></li>
   </ul>
 </div>
 

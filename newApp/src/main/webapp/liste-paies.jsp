@@ -4,6 +4,8 @@
 <%@ page import="eval.newApp.modele.employe.Employee" %>
 <%@ page import="eval.newApp.modele.login.LoginResponseHeaders" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="eval.newApp.modele.utils.NumberFormatterUtil" %>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -34,10 +36,7 @@
         <div><strong>Genre :</strong> <%= emp.getGender() %></div>
         <div><strong>Date de naissance :</strong> <%= sdf.format(emp.getDateOfBirth()) %></div>
         <div><strong>Date d'entrée :</strong> <%= sdf.format(emp.getDateOfJoining()) %></div>
-        <div><strong>Département :</strong> <%= emp.getDepartment() %></div>
-        <div><strong>Poste :</strong> <%= emp.getDesignation() %></div>
         <div><strong>Entreprise :</strong> <%= emp.getCompany() %></div>
-        <div><strong>Email :</strong> <%= emp.getEmail() %></div>
         <div><strong>Statut :</strong> <%= emp.getStatus() %></div>
     </div>
 
@@ -56,9 +55,9 @@
             for (SalarySlipDTO slip : paies) { %>
                 <tr>
                     <td><%= slip.getMois() %></td>
-                    <td><%= slip.getGrossPay() %> Ar</td>
-                    <td><%= slip.getNetPay() %> Ar</td>
-                    <td><a href="<%= request.getContextPath() %>/paies-pdf?fiche=<%= slip.getId() %>">Télécharger PDF</a></td>
+                    <td><%= NumberFormatterUtil.formatAmount(slip.getGrossPay()) %> </td>
+                    <td><%= NumberFormatterUtil.formatAmount(slip.getNetPay()) %> </td>
+                    <td><a href="<%= request.getContextPath() %>/paies-pdf?fiche=<%= slip.getId() %>"><button class="button-liste">Télécharger PDF</button></a></td>
                 </tr>
         <%  }
         } else { %>
@@ -111,6 +110,15 @@
     .paie-table th {
         background-color: #ecf0f1;
     }
+
+     .button-liste {
+                padding: 8px 16px;
+                background-color:#d9534f;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+        }
 </style>
 </body>
 </html>

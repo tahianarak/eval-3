@@ -6,6 +6,7 @@ import com.itextpdf.html2pdf.HtmlConverter;
 import eval.newApp.modele.pdf.Deduction;
 import eval.newApp.modele.pdf.Earning;
 import eval.newApp.modele.pdf.SalarySlip;
+import eval.newApp.modele.utils.NumberFormatterUtil;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -34,10 +35,11 @@ public class SalarySlipPdfGenerator {
                 <h1>Fiche de Paie</h1>
 
                 <table>
+                     <tr><td><strong>Fiche numero :</strong></td><td>{{numero fiche}}</td></tr>
                     <tr><td><strong>Employé :</strong></td><td>{{employeeName}}</td></tr>
                     <tr><td><strong>ID Employé :</strong></td><td>{{employeeId}}</td></tr>
                     <tr><td><strong>Période de Paie :</strong></td><td>{{payPeriod}}</td></tr>
-                    <tr><td><strong>Département :</strong></td><td>{{department}}</td></tr>
+                   
                 </table>
 
                 <h2>Gains</h2>
@@ -66,7 +68,7 @@ public class SalarySlipPdfGenerator {
         for (Earning earning : salarySlip.getEarnings()) {
             earningsRows.append("<tr>")
                     .append("<td>").append(escapeHtml(earning.getDescription())).append("</td>")
-                    .append("<td>").append(String.format("%.2f", earning.getAmount())).append("</td>")
+                    .append("<td>").append(NumberFormatterUtil.formatAmount(  earning.getAmount())).append("</td>")
                     .append("</tr>");
         }
 
@@ -75,21 +77,21 @@ public class SalarySlipPdfGenerator {
         for (Deduction deduction : salarySlip.getDeductions()) {
             deductionsRows.append("<tr>")
                     .append("<td>").append(escapeHtml(deduction.getDescription())).append("</td>")
-                    .append("<td>").append(String.format("%.2f", deduction.getAmount())).append("</td>")
+                    .append("<td>").append(NumberFormatterUtil.formatAmount(  deduction.getAmount())).append("</td>")
                     .append("</tr>");
         }
 
         // Remplacement des variables dans le template
         String html = htmlTemplate
+                .replace("{{numero fiche}}", escapeHtml(salarySlip.getId()))
                 .replace("{{employeeName}}", escapeHtml(salarySlip.getEmployeeName()))
                 .replace("{{employeeId}}", escapeHtml(salarySlip.getEmployeeId()))
                 .replace("{{payPeriod}}", escapeHtml(salarySlip.getPayPeriod()))
-                .replace("{{department}}", escapeHtml(salarySlip.getDepartment()))
                 .replace("{{earningsRows}}", earningsRows.toString())
                 .replace("{{deductionsRows}}", deductionsRows.toString())
-                .replace("{{grossPay}}", String.format("%.2f", salarySlip.getGrossPay()))
-                .replace("{{totalDeductions}}", String.format("%.2f", salarySlip.getTotalDeductions()))
-                .replace("{{netPay}}", String.format("%.2f", salarySlip.getNetPay()));
+                .replace("{{grossPay}}", NumberFormatterUtil.formatAmount(  salarySlip.getGrossPay()))
+                .replace("{{totalDeductions}}", NumberFormatterUtil.formatAmount(  salarySlip.getTotalDeductions()))
+                .replace("{{netPay}}", NumberFormatterUtil.formatAmount(  salarySlip.getNetPay()));
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         HtmlConverter.convertToPdf(html, outputStream);
