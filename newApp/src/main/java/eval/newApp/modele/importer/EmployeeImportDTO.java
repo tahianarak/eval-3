@@ -3,6 +3,8 @@ package eval.newApp.modele.importer;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Pattern;
+
 
 public class EmployeeImportDTO {
 
@@ -26,6 +28,9 @@ public class EmployeeImportDTO {
     }
 
     public void parseDate(String dateString)throws Exception {
+        if (!Pattern.matches("\\d{2}/\\d{2}/\\d{4}", dateString)) {
+            throw new Exception("la ligne de données " + this.ligne + " ,du fichier 1 contient un format de date invalide");
+        }
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         formatter.setLenient(false);
 

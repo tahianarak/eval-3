@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Controller
@@ -44,9 +45,10 @@ public class ImportController {
             sid=session.getAttribute("token").toString();
             // Traitement du fichier Utilisateurs
             if (!fichier1.isEmpty() && !fichier2.isEmpty() && !fichier3.isEmpty()) {
-                String employeContent = new String(fichier1.getBytes());
-                String salaryComponentandstructContent = new String(fichier2.getBytes());
-                String employeeSalary = new String(fichier3.getBytes());
+                String employeContent = new String(fichier1.getBytes(), StandardCharsets.UTF_8);
+                String salaryComponentandstructContent = new String(fichier2.getBytes(), StandardCharsets.UTF_8);
+                String employeeSalary = new String(fichier3.getBytes(), StandardCharsets.UTF_8);
+                System.out.println(salaryComponentandstructContent);
                 importService.sendEmployeesToFrappe(sid,employeContent,salaryComponentandstructContent,employeeSalary);
             }
             ModelAndView mv=new ModelAndView("accueil");

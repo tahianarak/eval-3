@@ -58,7 +58,7 @@ public class SalarySlipService {
         if (response.getStatusCode() == HttpStatus.OK) {
             JsonNode root = objectMapper.readTree(response.getBody());
             JsonNode dataArray = root.get("data");
-            System.out.println(dataArray);
+
             List<SalarySlip> salarySlips = new ArrayList<>();
 
             if (dataArray.isArray()) {

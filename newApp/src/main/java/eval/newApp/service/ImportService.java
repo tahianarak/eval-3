@@ -94,8 +94,11 @@ public class ImportService {
 
                 String mois = line[0].trim();
                 int refEmploye = Integer.parseInt(line[1].trim());
-                double salaireBase = Double.parseDouble(line[2].trim());
+                String salaireBaseStr= line[2].trim().replace(" ","").replace(",",".");
+                System.out.println("salairebase:"+salaireBaseStr);
+                double salaireBase = Double.parseDouble(salaireBaseStr);
                 String salaire = line[3].trim();
+
 
                 EmployeeSalaryDTO dto = new EmployeeSalaryDTO();
                 dto.setLigne(counter);
