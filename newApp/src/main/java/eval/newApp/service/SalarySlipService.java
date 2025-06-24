@@ -3,6 +3,7 @@ package eval.newApp.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eval.newApp.modele.SalaryComponent;
 import eval.newApp.modele.pdf.SalarySlip;
 import eval.newApp.modele.pdf.Earning;
 import eval.newApp.modele.pdf.Deduction;
@@ -30,11 +31,52 @@ public class SalarySlipService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RestTemplate restTemplate = new RestTemplate();
 
+
+    public List<SalaryComponent> getAll(String sid) throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        System.out.println("sid="+sid);
+        headers.add("Cookie", "sid=" + sid);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+        // Récupérer la facture d'achat
+        String url = baseUrl + "/api/resource/Salary Component?fields=[\"*\"]";
+
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            JsonNode root = objectMapper.readTree(response.getBody());
+            JsonNode data = root.get("data");
+
+
+
+            List<SalaryComponent> salaryComponents = new ArrayList<>();
+            for (JsonNode salaryComponentStr : data) {
+                SalaryComponent salaryComponent=new SalaryComponent();
+
+                salaryComponent.setAbbr(salaryComponentStr.path("salary_component_abbr").asText());
+                salaryComponent.setSalary_component(salaryComponentStr.path("salary_component").asText());
+                salaryComponent.setName(salaryComponentStr.path("name").asText());
+                salaryComponent.setType(salaryComponentStr.path("type").asText());
+
+                salaryComponents.add(salaryComponent);
+
+            }
+            return salaryComponents;
+        } else {
+            throw new Exception("Échec de la récupération du Supplier Quotation : " + response.getStatusCode());
+        }
+    }
+
+
+
+
+
     public List<SalarySlip> getSalarySlipsByMonth(String sid, String monthYear) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cookie", "sid=" + sid);
         headers.setContentType(MediaType.APPLICATION_JSON);
-        String url = baseUrl + "/api/resource/Salary Slip?fields=[\"name\",\"employee\",\"employee_name\",\"start_date\",\"end_date\",\"department\",\"gross_pay\",\"net_pay\"]"+"&limit_page_length=2500";
+        String url = baseUrl + "/api/resource/Salary Slip?fields=[\"name\",\"employee\",\"employee_name\",\"start_date\",\"end_date\",\"department\",\"gross_pay\",\"net_pay\",\"docstatus\"]"+"&limit_page_length=2500";
 
 
 
@@ -63,20 +105,24 @@ public class SalarySlipService {
 
             if (dataArray.isArray()) {
                 for (JsonNode data : dataArray) {
-                    // Ici on crée une fiche partielle, sans earnings et deductions
-                    SalarySlip partialSlip = new SalarySlip();
-                    partialSlip.setId(data.path("name").asText(null));
-                    partialSlip.setEmployeeName(data.path("employee_name").asText(null));
-                    partialSlip.setEmployeeId(data.path("employee").asText(null));
-                    partialSlip.setPayPeriod(data.path("start_date").asText(null) + " - " + data.path("end_date").asText(null));
-                    partialSlip.setStartDate(data.path("start_date").asText(null));
-                    partialSlip.setEndDate(data.path("end_date").asText(null));
-                    partialSlip.setDepartment(data.path("department").asText(null));
-                    partialSlip.setGrossPay(data.path("gross_pay").asDouble(0.0));
-                    partialSlip.setNetPay(data.path("net_pay").asDouble(0.0));
+                    if(data.path("docstatus").asInt()!=2) {
+                        System.out.println("docstatus:"+data.path("docstatus").asInt());
+                        // Ici on crée une fiche partielle, sans earnings et deductions
+                        SalarySlip partialSlip = new SalarySlip();
+                        partialSlip.setId(data.path("name").asText(null));
+                        partialSlip.setEmployeeName(data.path("employee_name").asText(null));
+                        partialSlip.setEmployeeId(data.path("employee").asText(null));
+                        partialSlip.setPayPeriod(data.path("start_date").asText(null) + " - " + data.path("end_date").asText(null));
+                        partialSlip.setStartDate(data.path("start_date").asText(null));
+                        partialSlip.setEndDate(data.path("end_date").asText(null));
+                        partialSlip.setDepartment(data.path("department").asText(null));
+                        partialSlip.setGrossPay(data.path("gross_pay").asDouble(0.0));
+                        partialSlip.setNetPay(data.path("net_pay").asDouble(0.0));
+                        partialSlip.setStructure(data.path("salary_structure").asText(null));
 
 
-                    salarySlips.add(partialSlip);
+                        salarySlips.add(partialSlip);
+                    }
                 }
             }
 
@@ -89,6 +135,81 @@ public class SalarySlipService {
 
 
             fullSalarySlips.sort(Comparator.comparing(SalarySlip::getStartDate));
+
+            return fullSalarySlips;
+        } else {
+            throw new Exception("Erreur récupération des Salary Slips : " + response.getStatusCode());
+        }
+    }
+
+
+
+    public List<SalarySlip> getSalarySlipsByMonth2(String sid, String monthYear) throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cookie", "sid=" + sid);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String url = baseUrl + "/api/resource/Salary Slip?fields=[\"*\"]"+"&limit_page_length=2500";
+
+
+
+        if (monthYear != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+            YearMonth yearMonth = YearMonth.parse(monthYear, formatter);
+
+            // Définir les dates de début et de fin du mois
+            String startDate = yearMonth.atDay(1).toString(); // Premier jour du mois
+            String endDate = yearMonth.atEndOfMonth().toString();
+            String filters = String.format("[[\"Salary Slip\", \"start_date\", \"<=\", \"%s\"]]",
+                    startDate, endDate);
+            url += "&filters=" + filters;
+        }
+
+        System.out.println("url:"+url);
+
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            JsonNode root = objectMapper.readTree(response.getBody());
+            JsonNode dataArray = root.get("data");
+
+            List<SalarySlip> salarySlips = new ArrayList<>();
+
+            if (dataArray.isArray()) {
+                for (JsonNode data : dataArray) {
+                    if(data.path("docstatus").asInt()!=2) {
+
+                        System.out.println("docstatus:"+data.path("docstatus").asInt());
+                        // Ici on crée une fiche partielle, sans earnings et deductions
+                        SalarySlip partialSlip = new SalarySlip();
+                        partialSlip.setId(data.path("name").asText(null));
+                        partialSlip.setEmployeeName(data.path("employee_name").asText(null));
+                        partialSlip.setEmployeeId(data.path("employee").asText(null));
+                        partialSlip.setPayPeriod(data.path("start_date").asText(null) + " - " + data.path("end_date").asText(null));
+                        partialSlip.setStartDate(data.path("start_date").asText(null));
+                        partialSlip.setEndDate(data.path("end_date").asText(null));
+                        partialSlip.setDepartment(data.path("department").asText(null));
+                        partialSlip.setGrossPay(data.path("gross_pay").asDouble(0.0));
+                        partialSlip.setNetPay(data.path("net_pay").asDouble(0.0));
+                        partialSlip.setStructure(data.path("salary_structure").asText(null));
+
+                        System.out.println("structure:" + partialSlip.getStructure());
+
+                        salarySlips.add(partialSlip);
+
+                    }
+                }
+            }
+
+            // Maintenant pour chaque fiche partielle on récupère les détails complets
+            List<SalarySlip> fullSalarySlips = new ArrayList<>();
+            for (SalarySlip slip : salarySlips) {
+                SalarySlip fullSlip = getSalarySlipById(sid, slip.getId());
+                fullSalarySlips.add(fullSlip);
+            }
+
+
+            fullSalarySlips.sort(Comparator.comparing(SalarySlip::getStartDate).reversed());
 
             return fullSalarySlips;
         } else {
@@ -120,6 +241,7 @@ public class SalarySlipService {
             salarySlip.setDepartment(data.path("department").asText(null));
             salarySlip.setStartDate(data.path("start_date").asText(null));
             salarySlip.setEndDate(data.path("end_date").asText(null));
+            salarySlip.setStructure(data.path("salary_structure").asText(null));
 
             salarySlip.setGrossPay(data.path("gross_pay").asDouble(0.0));
             salarySlip.setTotalDeductions(data.path("total_deductions").asDouble(0.0));

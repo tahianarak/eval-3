@@ -10,6 +10,10 @@
     <li><a href="<%= request.getContextPath() %>/import">importer les donnees </a></li>
     <li><a href="<%= request.getContextPath() %>/statistique">statistique</a></li>
     <li><a href="<%= request.getContextPath() %>/get-graph">graphique</a></li>
+    <li><a href="<%= request.getContextPath() %>/getInsertSalaire">insertion de salaire </a></li>
+    <li><a href="<%= request.getContextPath() %>/getFormualaireUpdate">update mutliple </a></li>
+
+
 
 
     <li><a href="/logout"> Deconnexion</a></li>

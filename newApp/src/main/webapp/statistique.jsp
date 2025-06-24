@@ -202,7 +202,7 @@
                 data: [<%= values.stream().map(String::valueOf).collect(Collectors.joining(",")) %>],
                 borderColor: "<%= color %>",
                 fill: false,
-                tension: 0.2
+                tension: 0
             });
             <% } %>
 
@@ -217,7 +217,7 @@
                 borderColor: "rgba(255,0,0,0.6)",
                 borderDash: [5, 5],
                 fill: false,
-                tension: 0.2
+                tension: 0
             });
             <% } %>
 
@@ -228,7 +228,7 @@
                 borderColor: "blue",
                 borderWidth: 2,
                 fill: false,
-                tension: 0.2
+                tension: 0
             });
 
             // TOTAL DEDUCTIONS
@@ -239,7 +239,7 @@
                 borderDash: [3, 3],
                 borderWidth: 2,
                 fill: false,
-                tension: 0.2
+                tension: 0
             });
 
             // NET PAY
@@ -249,7 +249,7 @@
                 borderColor: "#2c3e50",
                 borderWidth: 2,
                 fill: false,
-                tension: 0.2
+                tension: 0
             });
 
             const ctx = document.getElementById('salaryChart').getContext('2d');

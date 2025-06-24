@@ -1,6 +1,8 @@
 package eval.newApp.controller;
 
+import eval.newApp.modele.SalaryComponent;
 import eval.newApp.modele.employe.Employee;
+import eval.newApp.modele.employe.EmployeeDTO;
 import eval.newApp.modele.paie.SalarySlipDTO;
 import eval.newApp.modele.pdf.SalarySlip;
 import eval.newApp.service.EmployeService;
@@ -8,12 +10,14 @@ import eval.newApp.service.PaieService;
 import eval.newApp.service.SalarySlipPdfGenerator;
 import eval.newApp.service.SalarySlipService;
 import jakarta.jws.WebParam;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -38,6 +42,118 @@ public class PaieController {
     @Autowired
     EmployeService employeService;
 
+
+    @PostMapping("/update-data")
+    public ModelAndView updateData(HttpSession session,@RequestParam("composant") String composantName
+            ,@RequestParam("min_composant") double minComposant
+            ,@RequestParam("max_composant") double maxComposant
+            ,@RequestParam("min_salaire") double minSalaire
+            ,@RequestParam("max_salaire") double maxSalaire
+            ,@RequestParam("pourcentage") double pourcentage
+        )
+    {
+        try {
+            String sid=null;
+            if(session.getAttribute("token")==null)
+            {
+                throw new Exception("pas de session valide");
+            }
+            sid=session.getAttribute("token").toString();
+            paieService.updateFiltered(sid,composantName,minComposant,maxComposant,minSalaire,maxSalaire,pourcentage);
+            return getFormulaireUpdate(session);
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            ModelAndView mvi=new ModelAndView("error");
+            mvi.addObject("error",e.getMessage());
+            return mvi;
+        }
+    }
+    @GetMapping("/getFormualaireUpdate")
+    public ModelAndView getFormulaireUpdate(HttpSession session)
+    {
+        try {
+            String sid=null;
+            if(session.getAttribute("token")==null)
+            {
+                throw new Exception("pas de session valide");
+            }
+            sid=session.getAttribute("token").toString();
+
+            ModelAndView mv=new ModelAndView("UpdateMultiple");
+            List<SalaryComponent> components=salarySlipService.getAll(sid);
+            mv.addObject("components",components);
+            return mv;
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            ModelAndView mvi=new ModelAndView("error");
+            mvi.addObject("error",e.getMessage());
+            return mvi;
+        }
+
+    }
+
+    @PostMapping("/insertSalaire")
+    public  ModelAndView insertSalaire(@RequestParam("emp") String emp,
+                                       @RequestParam("mois_debut") String debut,
+                                       @RequestParam("mois_fin") String fin,
+                                       @RequestParam("salaire_base") String salaireBase,HttpSession session
+                                       )
+    {
+
+        try {
+            String sid=null;
+            if(session.getAttribute("token")==null)
+            {
+                throw new Exception("pas de session valide");
+            }
+            sid=session.getAttribute("token").toString();
+
+            paieService.insertMultipe(sid,emp,debut,fin,salaireBase);
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            ModelAndView mvi=new ModelAndView("error");
+            mvi.addObject("error",e.getMessage());
+            return mvi;
+        }
+
+
+
+        return getFormulaireSalaire(session);
+    }
+    @GetMapping("/getInsertSalaire")
+    public ModelAndView getFormulaireSalaire(HttpSession session)
+    {
+        try {
+            String sid=null;
+            if(session.getAttribute("token")==null)
+            {
+                throw new Exception("pas de session valide");
+            }
+            sid=session.getAttribute("token").toString();
+
+            List<EmployeeDTO> employeeDTO=employeService.getEmployees(sid);
+            ModelAndView mv=new ModelAndView("salaireInsert");
+            mv.addObject("employes",employeeDTO);
+
+            return mv;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            ModelAndView mvi=new ModelAndView("error");
+            mvi.addObject("error",e.getMessage());
+            return mvi;
+        }
+    }
     @GetMapping("/salaire-details-filtre")
     public ModelAndView getSalaireWithDetailsFiltre(HttpSession session)
     {
@@ -168,4 +284,7 @@ public class PaieController {
             return mvi;
         }
     }
+
+
+
 }

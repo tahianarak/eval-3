@@ -23,8 +23,22 @@ public class SalarySlip {
     private String employeeId;
     private String payPeriod;
 
+    String structure;
+
+    public String getStructure() {
+        return structure;
+    }
+
+    public void setStructure(String structure) {
+        this.structure = structure;
+    }
+
     Date startDate;
+
+    String dateStart;
     Date endDate;
+
+    String dateEnd;
     private String department;
 
     private List<Earning> earnings;
@@ -34,6 +48,22 @@ public class SalarySlip {
     private double totalDeductions;
     private double netPay;
 
+    public String getDateStart() {
+        return dateStart;
+    }
+
+    public void setDateStart(String dateStart) {
+        this.dateStart = dateStart;
+    }
+
+    public String getDateEnd() {
+        return dateEnd;
+    }
+
+    public void setDateEnd(String dateEnd) {
+        this.dateEnd = dateEnd;
+    }
+
     public Date getStartDate() {
         return startDate;
     }
@@ -41,6 +71,7 @@ public class SalarySlip {
     public void setStartDate(String startDate) {
         try {
             this.startDate = formatter.parse(startDate);
+            this.dateStart=startDate;
         } catch (ParseException e) {
             throw new RuntimeException("Format de date invalide pour startDate : " + startDate, e);
         }
@@ -53,6 +84,7 @@ public class SalarySlip {
     public void setEndDate(String endDate) {
         try {
             this.endDate = formatter.parse(endDate);
+            this.dateEnd=endDate;
         } catch (ParseException e) {
             throw new RuntimeException("Format de date invalide pour endDate : " + endDate, e);
         }
